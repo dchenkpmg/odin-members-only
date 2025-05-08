@@ -2,6 +2,7 @@ const db = require("../db/authQueries");
 const bcrypt = require("bcryptjs");
 const pool = require("../db/pool");
 const passport = require("passport");
+require("dotenv").config();
 
 async function getSignUp(req, res) {
   res.render("sign-up", {
@@ -32,29 +33,58 @@ async function getLogin(req, res) {
   });
 }
 
-async function postLogin(req, res, next) {
-  passport.authenticate("local", {
-    successRedirect: "/board",
-    failureRedirect: "/",
+async function loginBoard(req, res) {
+  const messages = await db.getMessages();
+  console.log(messages);
+  res.render("board", {
+    title: "Message Board",
+    user: req?.user,
+    messages: messages,
   });
 }
 
-async function loginBoard(req, res) {
-  res.render("board", {
-    title: "Message Board",
+async function postMessage(req, res) {
+  await db.createMessage(req.user.id, req.body.title, req.body.message);
+  res.redirect("/");
+}
+
+async function upgradeUser(req, res) {
+  res.render("upgrade", {
+    title: "Upgrade User",
     user: req.user,
   });
 }
 
-async function upgradeUser(req, res) {
-  res.send("Upgrade User");
+async function postUpgradeUser(req, res) {
+  const secret = req.body.secret;
+  if (
+    secret !== process.env.MEMBER_SECRET &&
+    secret !== process.env.ADMIN_SECRET
+  ) {
+    return res.status(403).send("Wrong Secret!");
+  } else if (secret === process.env.MEMBER_SECRET) {
+    await db.upgradeUser(req.user.id, "member");
+    res.redirect("/");
+  } else if (secret === process.env.ADMIN_SECRET) {
+    await db.upgradeUser(req.user.id, "admin");
+    res.redirect("/");
+  }
+}
+
+async function deleteMessage(req, res) {
+  console.log("Deleting message with ID: " + req.params.id);
+  const messageId = req.params.id;
+  await pool.query("DELETE FROM messages WHERE id = $1", [messageId]);
+  res.redirect("/");
 }
 
 module.exports = {
   getSignUp,
   postSignUp,
   getLogin,
-  postLogin,
+  postMessage,
   loginBoard,
   upgradeUser,
+  postUpgradeUser,
+  deleteMessage,
 };

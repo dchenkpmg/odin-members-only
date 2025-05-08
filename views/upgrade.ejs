@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= title %></title>
+    <link href="stylesheets/upgrade.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <h1><%= title %></h1>
+    </header>
+    <main>
+      <h2>Upgrade Your Account</h2>
+      <form action="/upgrade" method="POST">
+        <label for="secret">Secret:</label>
+        <input type="text" id="secret" name="secret" required />
+        <button type="submit">Join</button>
+      </form>
+      <a href="/">Back to Board</a>
+    </main>
+  </body>
+</html>

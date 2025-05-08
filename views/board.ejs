@@ -11,8 +11,66 @@
       <h1><%= title %></h1>
     </header>
     <main>
-      <h2>You logged in!</h2>
-      <a href="/upgrade">Become a member!</a>
+      <div class="board-header">
+        <h2>Messages</h2>
+        <div class="right-header">
+          <% if (!user) { %>
+          <a href="/login">Sign In</a>
+          <% } %>
+          <div class="member-options">
+            <% if (user) { %>
+            <a href="/upgrade">Promote your account!</a>
+            <a href="/log-out">Sign Out</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <div class="messages">
+        <% if (user && user.membership_status === "member") { %>
+        <p>You're a regular user!</p>
+        <% messages.forEach(function(message) { %>
+        <div class="message">
+          <h3><%= message.title %></h3>
+          <p><%= message.timestamp %></p>
+          <p><%= message.username %></p>
+          <p><%= message.message %></p>
+        </div>
+        <% }); %> <% } else if (user && user.membership_status === "admin") { %>
+        <p>You're an admin!</p>
+        <% messages.forEach(function(message) { %>
+        <div class="message">
+          <h3><%= message.title %></h3>
+          <p><%= message.timestamp %></p>
+          <p><%= message.username %></p>
+          <p><%= message.message %></p>
+          <form
+            class="delete-form"
+            action="/delete/<%= message.msg_id %>"
+            method="POST"
+          >
+            <button class="delete-btn" type="submit">Delete</button>
+          </form>
+        </div>
+        <% }); %> <% } else { %> <% if (user && user.membership_status ===
+        "pleb") { %>
+        <p>You're a pleb!</p>
+        <% } %> <% messages.forEach(function(message) { %>
+        <div class="message">
+          <h3><%= message.title %></h3>
+          <p><%= message.message %></p>
+        </div>
+        <% }); %> <% } %>
+      </div>
+      <% if (user && (user.membership_status === "member" ||
+      user.membership_status === "admin")) { %>
+      <form class="post-box" action="/message" method="POST">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required />
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+      <% } %>
     </main>
   </body>
 </html>
