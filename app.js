@@ -6,6 +6,7 @@ const passport = require("passport");
 const app = express();
 const pool = require("./db/pool");
 const router = require("./routes/index");
+const flash = require("connect-flash");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -32,6 +33,7 @@ app.use(
 require("./config/passport");
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 app.use("/", router);
 

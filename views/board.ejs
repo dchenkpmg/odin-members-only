@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><%= title %></title>
     <link href="stylesheets/board.css" rel="stylesheet" />
+    <link href="stylesheets/partials/errors.css" rel="stylesheet" />
   </head>
   <body>
     <header>
@@ -18,8 +19,9 @@
           <a href="/login">Sign In</a>
           <% } %>
           <div class="member-options">
-            <% if (user) { %>
+            <% if (user && (user.membership_status !== "admin")) { %>
             <a href="/upgrade">Promote your account!</a>
+            <% } %> <% if (user) { %>
             <a href="/log-out">Sign Out</a>
             <% } %>
           </div>
@@ -64,6 +66,7 @@
       <% if (user && (user.membership_status === "member" ||
       user.membership_status === "admin")) { %>
       <form class="post-box" action="/message" method="POST">
+        <%- include('partials/errors.ejs') %>
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" required />
         <label for="message">Message:</label>

@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><%= title %></title>
     <link href="stylesheets/login.css" rel="stylesheet" />
+    <link href="stylesheets/partials/errors.css" rel="stylesheet" />
   </head>
   <body>
     <header>
       <h1><%= title %></h1>
     </header>
     <main>
+      <%- include('partials/errors.ejs') %> <% if (message.length > 0) { %>
+      <p><%= message[0] %></p>
+      <% } %>
       <form action="/login" method="POST">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required />

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><%= title %></title>
     <link href="stylesheets/upgrade.css" rel="stylesheet" />
+    <link href="stylesheets/partials/errors.css" rel="stylesheet" />
   </head>
   <body>
     <header>
@@ -12,6 +13,7 @@
     </header>
     <main>
       <h2>Upgrade Your Account</h2>
+      <%- include('partials/errors.ejs') %>
       <form action="/upgrade" method="POST">
         <label for="secret">Secret:</label>
         <input type="text" id="secret" name="secret" required />

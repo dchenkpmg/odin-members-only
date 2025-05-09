@@ -1,7 +1,7 @@
 const db = require("../db/authQueries");
 const bcrypt = require("bcryptjs");
 const pool = require("../db/pool");
-const passport = require("passport");
+const { validationResult } = require("express-validator");
 require("dotenv").config();
 
 async function getSignUp(req, res) {
@@ -12,6 +12,13 @@ async function getSignUp(req, res) {
 
 async function postSignUp(req, res, next) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).render("sign-up", {
+        title: "Sign Up",
+        errors: errors.array(),
+      });
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     await db.createUser(
       req.body.username,
@@ -20,7 +27,8 @@ async function postSignUp(req, res, next) {
       req.body.lastName,
       "pleb",
     );
-    res.redirect("/");
+    req.flash("success", "User created successfully!");
+    res.redirect("/login");
   } catch (error) {
     console.error(error);
     next(error);
@@ -28,8 +36,13 @@ async function postSignUp(req, res, next) {
 }
 
 async function getLogin(req, res) {
+  const errorMessage = req.flash("error");
+  const successMessage = req.flash("success");
+  const message = errorMessage.length > 0 ? errorMessage : successMessage;
+  console.log(message);
   res.render("login", {
     title: "Login",
+    message: message,
   });
 }
 
@@ -44,6 +57,15 @@ async function loginBoard(req, res) {
 }
 
 async function postMessage(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("board", {
+      title: "Message Board",
+      user: req?.user,
+      messages: await db.getMessages(),
+      errors: errors.array(),
+    });
+  }
   await db.createMessage(req.user.id, req.body.title, req.body.message);
   res.redirect("/");
 }
@@ -56,6 +78,14 @@ async function upgradeUser(req, res) {
 }
 
 async function postUpgradeUser(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("upgrade", {
+      title: "Upgrade User",
+      user: req?.user,
+      errors: errors.array(),
+    });
+  }
   const secret = req.body.secret;
   if (
     secret !== process.env.MEMBER_SECRET &&
